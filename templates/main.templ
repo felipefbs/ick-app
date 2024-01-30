@@ -1,0 +1,77 @@
+package templates
+
+templ Main() {
+	<!DOCTYPE html>
+	<html lang="pt-BR">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+			<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+			<title>Ranços</title>
+		</head>
+		<body>
+			<header>
+				<nav>
+					<button hx-get="/register" hx-target="#main-container">Cadastre seus ranços</button>
+					<button hx-get="/definition" hx-target="#main-container">O que é?</button>
+					<button hx-get="/register-user" hx-target="#main-container">Cadastrar ou Logar</button>
+					<button hx-post="/logout" hx-target="#main-container">Deslogar</button>
+				</nav>
+			</header>
+			<main>
+				<div id="main-container">
+					@RegisterIck()
+				</div>
+			</main>
+		</body>
+	</html>
+}
+
+templ RegisterIck() {
+	<h1>Cadastre seus ranços</h1>
+	<form>
+		<input placeholder="qual o ranço da vez?" type="text" name="ick"/>
+		<button type="button" hx-post="/register" hx-target="#main-container">eca!</button>
+	</form>
+}
+
+templ RegisterUser() {
+	<div>
+		<h1>Login</h1>
+		<form>
+			<input placeholder="username" type="text" name="username"/>
+			<input placeholder="senha" type="password" name="password"/>
+			<button type="button" hx-post="/login" hx-target="#main-container" hx-ext="json-enc">login</button>
+		</form>
+	</div>
+	<div>
+		<h1>Cadastre-se</h1>
+		<p>
+			Seus dados serão usados apenas para fazer uma simples analise. Prometo não vender nada. Se quiser conferir o código só acessar o projeto <a href="www.github.com/felipefbs/ick-app">aqui</a>.
+		</p>
+		<form>
+			<input placeholder="username" type="text" name="username"/>
+			<input placeholder="Seu Nome" type="text" name="name"/>
+			<input placeholder="Data de Nascimento" type="date" name="birthdate"/>
+			<input placeholder="Genero" type="text" name="gender"/>
+			<input placeholder="senha" type="password" name="password"/>
+			<button type="button" hx-post="/register-user" hx-target="#main-container" hx-ext="json-enc">Cadastrar</button>
+		</form>
+	</div>
+}
+
+templ Definition() {
+	<h1>Icks</h1>
+	<p>
+		Icks, em uma tradução não informal, é um ranço que você tenha, geralmente totalmente aleatorio e irracional, mas as vezes assertivo e podendo ser algo que afete completamente o seu relacionamento. 
+	</p>
+	<p>
+		Ele geralmente vem no seu primeiro encontro, onde seu pretendente faz algo que para ele pode ser até normal, mas você tem um ranço profundo sobre isso.
+	</p>
+	<ul>
+		<li>Dentes levemente tortos</li>
+		<li>Mastiga de boca aberta</li>
+		<li>Fica com bafo de suco de abacaxi depois de tomar suco de abacaxi</li>
+	</ul>
+}
