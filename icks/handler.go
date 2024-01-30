@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/felipefbs/ick-app/templates"
+	"github.com/google/uuid"
 )
 
 type Handler struct {
@@ -40,14 +41,12 @@ func (handler *Handler) DefinitionPage(w http.ResponseWriter, r *http.Request) {
 func (handler *Handler) RegisterIck(w http.ResponseWriter, r *http.Request) {
 
 	ick := r.FormValue("ick")
-
 	coo, err := r.Cookie("session-cookie")
 	if err != nil {
 		log.Println(err)
 	}
 
-	userID := 0
-
+	userID := uuid.UUID{}
 	if coo.Valid() == nil {
 		err = handler.db.QueryRow("select id from users where username = $1", coo.Value).Scan(&userID)
 		if err != nil {
@@ -61,12 +60,10 @@ func (handler *Handler) RegisterIck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = handler.db.Exec("INSERT INTO icks (ick, registered_by) values ($1, $2)", ick, userID)
+	_, err = handler.db.Exec("INSERT INTO icks (id, ick, registered_by) values ($1, $2, $3)", uuid.New(), ick, userID)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }

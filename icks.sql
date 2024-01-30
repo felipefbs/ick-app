@@ -1,5 +1,5 @@
 CREATE TABLE "users" (
-  "id" INT INCREMENT PRIMARY KEY,
+  "id" uuid PRIMARY KEY,
   "username" varchar,
   "name" varchar,
   "gender" varchar,
@@ -9,7 +9,7 @@ CREATE TABLE "users" (
 );
 
 CREATE TABLE "icks" (
-  "id" INT INCREMENT PRIMARY KEY,
+  "id" uuid PRIMARY KEY,
   "ick" text,
   "registered_by" int default 0 REFERENCES "users" ("id"),
   "created_at" timestamp DEFAULT (CURRENT_TIMESTAMP)

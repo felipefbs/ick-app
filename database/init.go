@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 
-	_ "github.com/glebarez/go-sqlite"
+	_ "modernc.org/sqlite"
 )
 
 func InitDatabase() (*sql.DB, error) {

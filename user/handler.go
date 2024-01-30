@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/felipefbs/ick-app/templates"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -87,8 +88,6 @@ func (handler *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
 func (handler *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
@@ -108,8 +107,8 @@ func (handler *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = handler.db.Exec(
-		"INSERT INTO users (username, name, birthdate, gender, password) values ($1, $2, $3, $4, $5)",
-		user.Username, user.Name, user.Birthdate, user.Gender, user.Password)
+		"INSERT INTO users (id, username, name, birthdate, gender, password) values ($1, $2, $3, $4, $5, $6)",
+		uuid.New(), user.Username, user.Name, user.Birthdate, user.Gender, user.Password)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -132,7 +131,4 @@ func (handler *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
-
 }
