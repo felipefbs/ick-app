@@ -1,18 +1,18 @@
 package icks
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 
 	"github.com/felipefbs/ick-app/templates"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Handler struct {
-	db *pgxpool.Pool
+	db *sql.DB
 }
 
-func NewHandler(db *pgxpool.Pool) *Handler {
+func NewHandler(db *sql.DB) *Handler {
 	return &Handler{db}
 }
 
@@ -49,7 +49,7 @@ func (handler *Handler) RegisterIck(w http.ResponseWriter, r *http.Request) {
 	userID := 0
 
 	if coo.Valid() == nil {
-		err = handler.db.QueryRow(r.Context(), "select id from users where username = $1", coo.Value).Scan(&userID)
+		err = handler.db.QueryRow("select id from users where username = $1", coo.Value).Scan(&userID)
 		if err != nil {
 			log.Println(err)
 		}
@@ -61,7 +61,7 @@ func (handler *Handler) RegisterIck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = handler.db.Exec(r.Context(), "INSERT INTO icks (ick, registered_by) values ($1, $2)", ick, userID)
+	_, err = handler.db.Exec("INSERT INTO icks (ick, registered_by) values ($1, $2)", ick, userID)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)

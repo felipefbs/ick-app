@@ -1,13 +1,14 @@
 package server
 
 import (
+	"database/sql"
+
 	"github.com/felipefbs/ick-app/icks"
 	"github.com/felipefbs/ick-app/user"
 	"github.com/go-chi/chi/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func registerIckRoutes(router chi.Router, db *pgxpool.Pool) {
+func registerIckRoutes(router chi.Router, db *sql.DB) {
 	handler := icks.NewHandler(db)
 
 	router.Get("/", handler.MainPage)
@@ -17,7 +18,7 @@ func registerIckRoutes(router chi.Router, db *pgxpool.Pool) {
 	router.Post("/register", handler.RegisterIck)
 }
 
-func registerUserRoutes(router chi.Router, db *pgxpool.Pool) {
+func registerUserRoutes(router chi.Router, db *sql.DB) {
 	handler := user.NewHandler(db)
 
 	router.Get("/register-user", handler.RegisterPage)

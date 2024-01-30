@@ -1,21 +1,14 @@
 package main
 
 import (
-	"context"
 	"log"
 
+	"github.com/felipefbs/ick-app/database"
 	"github.com/felipefbs/ick-app/server"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
-	ctx := context.Background()
-	config, err := pgxpool.ParseConfig("user=admin password=12345 host=localhost port=5432 dbname=icks sslmode=disable pool_max_conns=10")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	db, err := pgxpool.New(ctx, config.ConnString())
+	db, err := database.InitDatabase()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -25,5 +18,4 @@ func main() {
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
-
 }

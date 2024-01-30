@@ -1,20 +1,20 @@
 package user
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/felipefbs/ick-app/templates"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Handler struct {
-	db *pgxpool.Pool
+	db *sql.DB
 }
 
-func NewHandler(db *pgxpool.Pool) *Handler {
+func NewHandler(db *sql.DB) *Handler {
 	return &Handler{db}
 }
 
@@ -57,7 +57,7 @@ func (handler *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := User{}
-	err = handler.db.QueryRow(r.Context(), "SELECT id, username, password from users where username=$1", loginInfo.Username).Scan(&user.ID, &user.Username, &user.Password)
+	err = handler.db.QueryRow("SELECT id, username, password from users where username=$1", loginInfo.Username).Scan(&user.ID, &user.Username, &user.Password)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -108,7 +108,6 @@ func (handler *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = handler.db.Exec(
-		r.Context(),
 		"INSERT INTO users (username, name, birthdate, gender, password) values ($1, $2, $3, $4, $5)",
 		user.Username, user.Name, user.Birthdate, user.Gender, user.Password)
 	if err != nil {
