@@ -1,22 +1,20 @@
 package user
 
 import (
-	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/felipefbs/ick-app/templates"
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Handler struct {
-	db *sql.DB
+	repo *Repository
 }
 
-func NewHandler(db *sql.DB) *Handler {
-	return &Handler{db}
+func NewHandler(repo *Repository) *Handler {
+	return &Handler{repo: repo}
 }
 
 func (handler *Handler) RegisterPage(w http.ResponseWriter, r *http.Request) {
@@ -57,10 +55,8 @@ func (handler *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := User{}
-	err = handler.db.QueryRow("SELECT id, username, password from users where username=$1", loginInfo.Username).Scan(&user.ID, &user.Username, &user.Password)
+	user, err := handler.repo.GetByUsername(r.Context(), loginInfo.Username)
 	if err != nil {
-		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 
 		return
@@ -91,26 +87,15 @@ func (handler *Handler) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
-	user := &User{}
-	err := json.NewDecoder(r.Body).Decode(&user)
+	user, err := NewUserFromRequestBody(r.Body)
 	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	user, err = NewUser(user.Username, user.Name, user.Gender, user.Birthdate, user.Password)
-	if err != nil {
-		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
+
 		return
 	}
 
-	_, err = handler.db.Exec(
-		"INSERT INTO users (id, username, name, birthdate, gender, password) values ($1, $2, $3, $4, $5, $6)",
-		uuid.New(), user.Username, user.Name, user.Birthdate, user.Gender, user.Password)
+	err = handler.repo.Save(r.Context(), user)
 	if err != nil {
-		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 
 		return
@@ -126,6 +111,7 @@ func (handler *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, coo)
+
 	err = templates.RegisterIck().Render(r.Context(), w)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
