@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"log/slog"
 
+	"github.com/felipefbs/ick-app/entities"
 	"github.com/google/uuid"
 )
 
@@ -16,7 +17,7 @@ func NewRepository(db *sql.DB) *Repository {
 	return &Repository{db}
 }
 
-func (repo *Repository) Save(ctx context.Context, user *User) error {
+func (repo *Repository) Save(ctx context.Context, user *entities.User) error {
 	_, err := repo.db.ExecContext(ctx,
 		"INSERT INTO users (id, username, name, birthdate, gender, password) values ($1, $2, $3, $4, $5, $6)",
 		uuid.New(), user.Username, user.Name, user.Birthdate, user.Gender, user.Password)
@@ -29,8 +30,8 @@ func (repo *Repository) Save(ctx context.Context, user *User) error {
 	return nil
 }
 
-func (repo *Repository) GetByUsername(ctx context.Context, username string) (*User, error) {
-	user := User{}
+func (repo *Repository) GetByUsername(ctx context.Context, username string) (*entities.User, error) {
+	user := entities.User{}
 	err := repo.db.QueryRow("SELECT id, username, password from users where username = ?", username).Scan(&user.ID, &user.Username, &user.Password)
 	if err != nil {
 		slog.Error("failed to find user", "error", err, "username", username)

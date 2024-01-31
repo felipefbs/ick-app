@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/felipefbs/ick-app/entities"
 	"github.com/felipefbs/ick-app/templates"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -87,7 +88,7 @@ func (handler *Handler) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
-	user, err := NewUserFromRequestBody(r.Body)
+	user, err := entities.NewUserFromRequestBody(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 
