@@ -20,14 +20,38 @@ func NewRepository(db *sql.DB) *Repository {
 func (repo *Repository) Save(ctx context.Context, ick string, userID uuid.UUID) error {
 	if ick == "" {
 		slog.Warn("cant save empty ick")
+
 		return nil
 	}
 
-	_, err := repo.db.ExecContext(ctx,
-		"INSERT INTO icks (id, ick, registered_by) values (?, ?, ?)",
-		uuid.New(), ick, userID)
+	tx, err := repo.db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
-		slog.Error("failed to save ick into database", "error", err)
+		slog.Error("failed to start transaction", "error", err)
+
+		return err
+	}
+
+	defer tx.Rollback()
+
+	ickID := uuid.New()
+	_, err = tx.ExecContext(ctx,
+		"INSERT INTO icks (id, ick, registered_by) values (?, ?, ?)",
+		ickID, ick, userID)
+	if err != nil {
+		slog.Error("failed to save ick into database", "error", err, "table", "icks")
+		return err
+	}
+
+	_, err = tx.ExecContext(ctx, "INSERT INTO user_icks (user_id, icks_id) values (?, ?)", userID, ickID)
+	if err != nil {
+		slog.Error("failed to save ick into database", "error", err, "table", "user_icks")
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		slog.Error("failed to commit transaction", "error", err)
+
 		return err
 	}
 
@@ -58,7 +82,7 @@ func (repo *Repository) Get(ctx context.Context) ([]entities.Ick, error) {
 
 	rows, err := tx.QueryContext(ctx, "SELECT id, ick, registered_by FROM icks")
 	if err != nil {
-		slog.Error("failed to list all icks", "error", err)
+		slog.Error("failed to list all icks", "error", err, "table", "icks")
 
 		return nil, err
 	}
