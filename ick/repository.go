@@ -1,4 +1,4 @@
-package icks
+package ick
 
 import (
 	"context"
