@@ -72,8 +72,8 @@ func (handler *Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 	coo := &http.Cookie{
 		Name:     "session-cookie",
-		Value:    user.Username,
-		MaxAge:   3600,
+		Value:    user.ID.String(),
+		MaxAge:   3600 * 24,
 		Domain:   "localhost",
 		Secure:   false,
 		HttpOnly: true,
@@ -104,8 +104,8 @@ func (handler *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	coo := &http.Cookie{
 		Name:     "session-cookie",
-		Value:    user.Username,
-		MaxAge:   3600,
+		Value:    user.ID.String(),
+		MaxAge:   3600 * 24,
 		Domain:   "localhost",
 		Secure:   false,
 		HttpOnly: true,
