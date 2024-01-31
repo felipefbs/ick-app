@@ -9,7 +9,9 @@ import (
 )
 
 func registerIckRoutes(router chi.Router, db *sql.DB) {
-	handler := icks.NewHandler(db)
+	repo := icks.NewRepository(db)
+	userRepo := user.NewRepository(db)
+	handler := icks.NewHandler(repo, userRepo)
 
 	router.Get("/", handler.MainPage)
 	router.Get("/definition", handler.DefinitionPage)
@@ -19,7 +21,8 @@ func registerIckRoutes(router chi.Router, db *sql.DB) {
 }
 
 func registerUserRoutes(router chi.Router, db *sql.DB) {
-	handler := user.NewHandler(db)
+	repo := user.NewRepository(db)
+	handler := user.NewHandler(repo)
 
 	router.Get("/register-user", handler.RegisterPage)
 	router.Post("/login", handler.Login)
