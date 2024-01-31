@@ -1,11 +1,14 @@
 package templates
 
+import "github.com/felipefbs/ick-app/entities"
+
 templ Main() {
 	<!DOCTYPE html>
 	<html lang="pt-BR">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<link rel="stylesheet" type="text/css" href="/static/reset.css"/>
 			<script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
 			<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
 			<title>Ranços</title>
@@ -13,16 +16,15 @@ templ Main() {
 		<body>
 			<header>
 				<nav>
+					<button hx-get="/ick-list" hx-target="#main-container">Listagem</button>
 					<button hx-get="/register" hx-target="#main-container">Cadastre seus ranços</button>
 					<button hx-get="/definition" hx-target="#main-container">O que é?</button>
 					<button hx-get="/register-user" hx-target="#main-container">Cadastrar ou Logar</button>
 					<button hx-post="/logout" hx-target="#main-container">Deslogar</button>
 				</nav>
 			</header>
-			<main>
-				<div id="main-container">
-					@RegisterIck()
-				</div>
+			<main id="main-container">
+				@RegisterIck()
 			</main>
 		</body>
 	</html>
@@ -73,5 +75,13 @@ templ Definition() {
 		<li>Dentes levemente tortos</li>
 		<li>Mastiga de boca aberta</li>
 		<li>Fica com bafo de suco de abacaxi depois de tomar suco de abacaxi</li>
+	</ul>
+}
+
+templ IckList(ickList []entities.Ick) {
+	<ul>
+		for _, item := range ickList {
+			<li>{ item.Ick } - { item.User.Username }</li>
+		}
 	</ul>
 }

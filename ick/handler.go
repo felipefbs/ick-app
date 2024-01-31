@@ -21,6 +21,20 @@ func NewHandler(repo *Repository, userRepo *user.Repository) *Handler {
 	}
 }
 
+func (handler *Handler) ListPage(w http.ResponseWriter, r *http.Request) {
+	ickList, err := handler.repo.Get(r.Context())
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+
+		return
+	}
+
+	err = templates.IckList(ickList).Render(r.Context(), w)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+}
+
 func (handler *Handler) MainPage(w http.ResponseWriter, r *http.Request) {
 	err := templates.Main().Render(r.Context(), w)
 	if err != nil {

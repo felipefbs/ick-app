@@ -14,6 +14,7 @@ func registerIckRoutes(router chi.Router, db *sql.DB) {
 	handler := ick.NewHandler(repo, userRepo)
 
 	router.Get("/", handler.MainPage)
+	router.Get("/ick-list", handler.ListPage)
 	router.Get("/definition", handler.DefinitionPage)
 	router.Get("/register", handler.IckPage)
 
