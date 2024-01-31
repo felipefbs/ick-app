@@ -7,5 +7,6 @@ import (
 )
 
 func InitDatabase() (*sql.DB, error) {
-	return sql.Open("sqlite", "local.db")
+
+	return sql.Open("sqlite", "/tmp/local.db")
 }
