@@ -6,6 +6,7 @@ import (
 
 	"github.com/felipefbs/ick-app/templates"
 	"github.com/felipefbs/ick-app/user"
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
 
@@ -29,7 +30,24 @@ func (handler *Handler) ListPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = templates.IckList(ickList).Render(r.Context(), w)
+	coo, err := r.Cookie("session-cookie")
+	if err != nil {
+		slog.Error("failed to get cookie", "error", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	userID, err := uuid.Parse(coo.Value)
+	if err != nil {
+		slog.Error("failed to parse user id", "error", err)
+	}
+
+	userIckList, err := handler.repo.FindUserIcks(r.Context(), userID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	err = templates.IckList(ickList, coo.Value, userIckList).Render(r.Context(), w)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
@@ -64,10 +82,11 @@ func (handler *Handler) RegisterIck(w http.ResponseWriter, r *http.Request) {
 
 	userID := uuid.UUID{}
 	if err := coo.Valid(); err == nil {
-		userID, _ = handler.userRepo.GetUserIDByUsername(r.Context(), coo.Value)
+		userID, _ = uuid.Parse(coo.Value)
 	}
 
 	ick := r.FormValue("ick")
+	slog.Info(ick)
 
 	err = handler.repo.Save(r.Context(), ick, userID)
 	if err != nil {
@@ -81,6 +100,33 @@ func (handler *Handler) RegisterIck(w http.ResponseWriter, r *http.Request) {
 		slog.Error("failed to render template", "error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 
+		return
+	}
+}
+
+func (handler *Handler) Upvote(w http.ResponseWriter, r *http.Request) {
+	coo, err := r.Cookie("session-cookie")
+	if err != nil {
+		slog.Error("failed to get cookie", "error", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	userID, err := uuid.Parse(coo.Value)
+	if err != nil {
+		return
+	}
+
+	ickID, err := uuid.Parse(chi.URLParam(r, "ick-id"))
+	if err != nil {
+		slog.Error("invalid ick id", "error", err, "id", chi.URLParam(r, "ick-id"))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	err = handler.repo.Upvote(r.Context(), userID, ickID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 }

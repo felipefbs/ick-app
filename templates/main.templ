@@ -1,6 +1,8 @@
 package templates
 
 import "github.com/felipefbs/ick-app/entities"
+import "fmt"
+import "github.com/google/uuid"
 
 templ Main() {
 	<!DOCTYPE html>
@@ -24,7 +26,7 @@ templ Main() {
 				</nav>
 			</header>
 			<main id="main-container">
-				@RegisterIck()
+				<div hx-get="/ick-list" hx-target="#main-container" hx-trigger="load"></div>
 			</main>
 		</body>
 	</html>
@@ -78,10 +80,15 @@ templ Definition() {
 	</ul>
 }
 
-templ IckList(ickList []entities.Ick) {
-	<ul>
+templ IckList(ickList []entities.Ick, loggedUsername string, upvotedList map[uuid.UUID]bool) {
+	<ul hx-get="/ick-list" hx-swap="outerHTML">
 		for _, item := range ickList {
-			<li>{ item.Ick } - { item.User.Username }</li>
+			<li>
+				{ item.Ick } - { item.User.Username }
+				if item.User.ID.String() != loggedUsername && !upvotedList[item.ID] {
+					<button type="button" hx-put={ fmt.Sprintf("/upvote/%v", item.ID) }>eca!</button>
+				}
+			</li>
 		}
 	</ul>
 }

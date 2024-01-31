@@ -18,6 +18,8 @@ func registerIckRoutes(router chi.Router, db *sql.DB) {
 	router.Get("/definition", handler.DefinitionPage)
 	router.Get("/register", handler.IckPage)
 
+	router.Put("/upvote/{ick-id}", handler.Upvote)
+
 	router.Post("/register", handler.RegisterIck)
 }
 
