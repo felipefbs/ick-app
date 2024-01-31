@@ -31,7 +31,7 @@ func (repo *Repository) Save(ctx context.Context, user *User) error {
 
 func (repo *Repository) GetByUsername(ctx context.Context, username string) (*User, error) {
 	user := User{}
-	err := repo.db.QueryRow("SELECT id, name, password from users where username = ?", username).Scan(&user.ID, &user.Username, &user.Password)
+	err := repo.db.QueryRow("SELECT id, username, password from users where username = ?", username).Scan(&user.ID, &user.Username, &user.Password)
 	if err != nil {
 		slog.Error("failed to find user", "error", err, "username", username)
 
