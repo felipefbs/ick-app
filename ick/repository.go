@@ -18,6 +18,11 @@ func NewRepository(db *sql.DB) *Repository {
 }
 
 func (repo *Repository) Save(ctx context.Context, ick string, userID uuid.UUID) error {
+	if ick == "" {
+		slog.Warn("cant save empty ick")
+		return nil
+	}
+
 	_, err := repo.db.ExecContext(ctx,
 		"INSERT INTO icks (id, ick, registered_by) values (?, ?, ?)",
 		uuid.New(), ick, userID)
