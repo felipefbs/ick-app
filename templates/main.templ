@@ -16,20 +16,24 @@ templ Main() {
 			<title>Ranços</title>
 		</head>
 		<body>
-			<header>
-				<nav>
-					<button hx-get="/ick-list" hx-target="#main-container">Listagem</button>
-					<button hx-get="/register" hx-target="#main-container">Cadastre seus ranços</button>
-					<button hx-get="/definition" hx-target="#main-container">O que é?</button>
-					<button hx-get="/register-user" hx-target="#main-container">Cadastrar ou Logar</button>
-					<button hx-post="/logout" hx-target="#main-container">Deslogar</button>
-				</nav>
-			</header>
+			@Header()
 			<main id="main-container">
 				<div hx-get="/ick-list" hx-target="#main-container" hx-trigger="load"></div>
 			</main>
 		</body>
 	</html>
+}
+
+templ Header() {
+	<header>
+		<nav>
+			<button hx-get="/ick-list" hx-target="#main-container">Listagem</button>
+			<button hx-get="/register" hx-target="#main-container">Cadastre seus ranços</button>
+			<button hx-get="/definition" hx-target="#main-container">O que é?</button>
+			<button hx-get="/register-user" hx-target="#main-container">Cadastrar ou Logar</button>
+			<button hx-post="/logout" hx-target="#main-container">Deslogar</button>
+		</nav>
+	</header>
 }
 
 templ RegisterIck() {
