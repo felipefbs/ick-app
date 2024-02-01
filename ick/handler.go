@@ -47,28 +47,28 @@ func (handler *Handler) ListPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = templates.IckList(ickList, coo.Value, userIckList).Render(r.Context(), w)
+	err = templates.Main(templates.IckList(ickList, coo.Value, userIckList)).Render(r.Context(), w)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
 
 func (handler *Handler) MainPage(w http.ResponseWriter, r *http.Request) {
-	err := templates.Main().Render(r.Context(), w)
+	err := templates.Main(templates.Definition()).Render(r.Context(), w)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
 
 func (handler *Handler) IckPage(w http.ResponseWriter, r *http.Request) {
-	err := templates.RegisterIck().Render(r.Context(), w)
+	err := templates.Main(templates.RegisterIck()).Render(r.Context(), w)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
 
 func (handler *Handler) DefinitionPage(w http.ResponseWriter, r *http.Request) {
-	err := templates.Definition().Render(r.Context(), w)
+	err := templates.Main(templates.Definition()).Render(r.Context(), w)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
@@ -95,7 +95,7 @@ func (handler *Handler) RegisterIck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = templates.RegisterIck().Render(r.Context(), w)
+	err = templates.Main(templates.RegisterIck()).Render(r.Context(), w)
 	if err != nil {
 		slog.Error("failed to render template", "error", err)
 		w.WriteHeader(http.StatusInternalServerError)

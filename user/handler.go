@@ -36,6 +36,7 @@ func (handler *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, coo)
+
 	err := templates.RegisterUser().Render(r.Context(), w)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

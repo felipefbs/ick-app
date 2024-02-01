@@ -4,7 +4,7 @@ import "github.com/felipefbs/ick-app/entities"
 import "fmt"
 import "github.com/google/uuid"
 
-templ Main() {
+templ Main(content templ.Component) {
 	<!DOCTYPE html>
 	<html lang="pt-BR">
 		<head>
@@ -15,84 +15,105 @@ templ Main() {
 			<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
 			<title>Ranços</title>
 		</head>
-		<body>
-			@Header()
-			<main id="main-container">
-				<div hx-get="/ick-list" hx-target="#main-container" hx-trigger="load"></div>
-			</main>
+		<body id="body">
+			@content
 		</body>
 	</html>
 }
 
 templ Header() {
 	<header>
-		<nav>
-			<button hx-get="/ick-list" hx-target="#main-container">Listagem</button>
-			<button hx-get="/register" hx-target="#main-container">Cadastre seus ranços</button>
-			<button hx-get="/definition" hx-target="#main-container">O que é?</button>
-			<button hx-get="/register-user" hx-target="#main-container">Cadastrar ou Logar</button>
-			<button hx-post="/logout" hx-target="#main-container">Deslogar</button>
+		<nav hx-boost="true">
+			<a href="/ick-list">Listagem</a>
+			<a href="/register">Cadastre seus ranços</a>
+			<a href="/definition">O que é?</a>
+			<a href="/register-user">Cadastrar ou Logar</a>
+			<a hx-post="/logout" hx-target="#body">Deslogar</a>
 		</nav>
 	</header>
 }
 
 templ RegisterIck() {
-	<h1>Cadastre seus ranços</h1>
-	<form>
-		<input placeholder="qual o ranço da vez?" type="text" name="ick"/>
-		<button type="button" hx-post="/register" hx-target="#main-container">eca!</button>
-	</form>
+	<body id="body">
+		@Header()
+		<h1>Cadastre seus ranços</h1>
+		<form>
+			<input placeholder="qual o ranço da vez?" type="text" name="ick"/>
+			<button type="button" hx-post="/register" hx-target="none">eca!</button>
+		</form>
+	</body>
 }
 
-templ RegisterUser() {
+templ LoginComponent() {
 	<div>
 		<h1>Login</h1>
 		<form>
 			<input placeholder="username" type="text" name="username"/>
 			<input placeholder="senha" type="password" name="password"/>
-			<button type="button" hx-post="/login" hx-target="#main-container" hx-ext="json-enc">login</button>
+			<button type="button" hx-post="/login" hx-ext="json-enc" hx-target="#body">login</button>
 		</form>
 	</div>
-	<div>
-		<h1>Cadastre-se</h1>
-		<p>
-			Seus dados serão usados apenas para fazer uma simples analise. Prometo não vender nada. Se quiser conferir o código só acessar o projeto <a href="www.github.com/felipefbs/ick-app">aqui</a>.
-		</p>
-		<form>
-			<input placeholder="username" type="text" name="username"/>
-			<input placeholder="Seu Nome" type="text" name="name"/>
-			<input placeholder="Data de Nascimento" type="date" name="birthdate"/>
-			<input placeholder="Genero" type="text" name="gender"/>
-			<input placeholder="senha" type="password" name="password"/>
-			<button type="button" hx-post="/register-user" hx-target="#main-container" hx-ext="json-enc">Cadastrar</button>
-		</form>
-	</div>
+}
+
+templ RegisterUser() {
+	<body id="body">
+		@Header()
+		@LoginComponent()
+		<div>
+			<h1>Cadastre-se</h1>
+			<p>
+				Seus dados serão usados apenas para fazer uma simples analise. Prometo não vender nada. Se quiser conferir o código só acessar o projeto <a href="www.github.com/felipefbs/ick-app">aqui</a>.
+			</p>
+			<form>
+				<input placeholder="username" type="text" name="username"/>
+				<input placeholder="Seu Nome" type="text" name="name"/>
+				<input placeholder="Data de Nascimento" type="date" name="birthdate"/>
+				<input placeholder="Genero" type="text" name="gender"/>
+				<input placeholder="senha" type="password" name="password"/>
+				<input type="submit" hx-post="/register-user" hx-ext="json-enc"/>
+			</form>
+		</div>
+	</body>
 }
 
 templ Definition() {
-	<h1>Icks</h1>
-	<p>
-		Icks, em uma tradução não informal, é um ranço que você tenha, geralmente totalmente aleatorio e irracional, mas as vezes assertivo e podendo ser algo que afete completamente o seu relacionamento. 
-	</p>
-	<p>
-		Ele geralmente vem no seu primeiro encontro, onde seu pretendente faz algo que para ele pode ser até normal, mas você tem um ranço profundo sobre isso.
-	</p>
-	<ul>
-		<li>Dentes levemente tortos</li>
-		<li>Mastiga de boca aberta</li>
-		<li>Fica com bafo de suco de abacaxi depois de tomar suco de abacaxi</li>
-	</ul>
+	<body id="body">
+		@Header()
+		<h1>Icks</h1>
+		<p>
+			Icks, em uma tradução não informal, é um ranço que você tenha, geralmente totalmente aleatorio e irracional, mas as vezes assertivo e podendo ser algo que afete completamente o seu relacionamento. 
+		</p>
+		<p>
+			Ele geralmente vem no seu primeiro encontro, onde seu pretendente faz algo que para ele pode ser até normal, mas você tem um ranço profundo sobre isso.
+		</p>
+		<ul>
+			<li>Dentes levemente tortos</li>
+			<li>Mastiga de boca aberta</li>
+			<li>Fica com bafo de suco de abacaxi depois de tomar suco de abacaxi</li>
+		</ul>
+	</body>
 }
 
 templ IckList(ickList []entities.Ick, loggedUsername string, upvotedList map[uuid.UUID]bool) {
-	<ul hx-get="/ick-list" hx-swap="outerHTML">
-		for _, item := range ickList {
-			<li>
-				{ item.Ick } - { item.User.Username }
-				if item.User.ID.String() != loggedUsername && !upvotedList[item.ID] {
-					<button type="button" hx-put={ fmt.Sprintf("/upvote/%v", item.ID) }>eca!</button>
-				}
-			</li>
-		}
-	</ul>
+	<body id="body">
+		@Header()
+		<ul hx-get="/ick-list" hx-swap="outerHTML" hx-target="#body" hx-trigger="none">
+			for _, item := range ickList {
+				<li>
+					{ item.Ick } - { item.User.Username }
+					if item.User.ID.String() != loggedUsername && !upvotedList[item.ID] {
+						<button type="button" hx-put={ fmt.Sprintf("/upvote/%v", item.ID) }>eca!</button>
+					}
+				</li>
+			}
+		</ul>
+	</body>
+}
+
+templ NotLoggedPage() {
+	<body id="body">
+		@Header()
+		<h1>Você não está logado!</h1>
+		@LoginComponent()
+	</body>
 }
