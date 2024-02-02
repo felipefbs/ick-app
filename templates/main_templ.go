@@ -59,7 +59,7 @@ func Header() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header><nav hx-boost=\"true\"><a href=\"/ick-list\">Listagem</a> <a href=\"/register\">Cadastre seus ranços</a> <a href=\"/definition\">O que é?</a> <a href=\"/register-user\">Cadastrar ou Logar</a> <a hx-post=\"/logout\" hx-target=\"#body\">Deslogar</a></nav></header>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header><nav hx-boost=\"true\"><a href=\"/ick-list\">Listagem</a> <a href=\"/register\">Cadastre seus ranços</a> <a href=\"/definition\">O que é?</a> <a href=\"/register-user\">Cadastrar ou Logar</a> <a href=\"/\" hx-post=\"/logout\" hx-target=\"#body\">Deslogar</a></nav></header>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -91,7 +91,7 @@ func RegisterIck() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1>Cadastre seus ranços</h1><form><input placeholder=\"qual o ranço da vez?\" type=\"text\" name=\"ick\"> <button type=\"button\" hx-post=\"/register\" hx-target=\"none\">eca!</button></form></body>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1>Cadastre seus ranços</h1><form><input placeholder=\"qual o ranço da vez?\" type=\"text\" name=\"ick\"> <button type=\"button\" hx-post=\"/register\" hx-target=\"#body\">eca!</button></form></body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

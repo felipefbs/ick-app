@@ -3,6 +3,7 @@ package user
 import (
 	"encoding/json"
 	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/felipefbs/ick-app/entities"
@@ -19,8 +20,9 @@ func NewHandler(repo *Repository) *Handler {
 }
 
 func (handler *Handler) RegisterPage(w http.ResponseWriter, r *http.Request) {
-	err := templates.RegisterUser().Render(r.Context(), w)
+	err := templates.Main(templates.RegisterUser()).Render(r.Context(), w)
 	if err != nil {
+		slog.Error("failed to render template", "error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
@@ -37,7 +39,7 @@ func (handler *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, coo)
 
-	err := templates.RegisterUser().Render(r.Context(), w)
+	err := templates.Main(templates.RegisterUser()).Render(r.Context(), w)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -81,7 +83,7 @@ func (handler *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, coo)
-	err = templates.RegisterIck().Render(r.Context(), w)
+	err = templates.Main(templates.RegisterIck()).Render(r.Context(), w)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -114,7 +116,7 @@ func (handler *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, coo)
 
-	err = templates.RegisterIck().Render(r.Context(), w)
+	err = templates.Main(templates.RegisterIck()).Render(r.Context(), w)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

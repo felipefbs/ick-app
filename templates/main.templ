@@ -28,7 +28,7 @@ templ Header() {
 			<a href="/register">Cadastre seus ranços</a>
 			<a href="/definition">O que é?</a>
 			<a href="/register-user">Cadastrar ou Logar</a>
-			<a hx-post="/logout" hx-target="#body">Deslogar</a>
+			<a href="/" hx-post="/logout" hx-target="#body">Deslogar</a>
 		</nav>
 	</header>
 }
@@ -39,7 +39,7 @@ templ RegisterIck() {
 		<h1>Cadastre seus ranços</h1>
 		<form>
 			<input placeholder="qual o ranço da vez?" type="text" name="ick"/>
-			<button type="button" hx-post="/register" hx-target="none">eca!</button>
+			<button type="button" hx-post="/register" hx-target="#body">eca!</button>
 		</form>
 	</body>
 }
