@@ -1,4 +1,4 @@
-package user
+package handlers
 
 import (
 	"encoding/json"
@@ -6,20 +6,21 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/felipefbs/ick-app/entities"
+	"github.com/felipefbs/ick-app/internal/repositories"
+	"github.com/felipefbs/ick-app/pkg/user"
 	"github.com/felipefbs/ick-app/templates"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Handler struct {
-	repo *Repository
+type UserHandler struct {
+	repo *repositories.UserRepository
 }
 
-func NewHandler(repo *Repository) *Handler {
-	return &Handler{repo: repo}
+func NewUserHandler(repo *repositories.UserRepository) *UserHandler {
+	return &UserHandler{repo: repo}
 }
 
-func (handler *Handler) RegisterPage(w http.ResponseWriter, r *http.Request) {
+func (handler *UserHandler) RegisterPage(w http.ResponseWriter, r *http.Request) {
 	err := templates.Main(templates.RegisterUser()).Render(r.Context(), w)
 	if err != nil {
 		slog.Error("failed to render template", "error", err)
@@ -28,7 +29,7 @@ func (handler *Handler) RegisterPage(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (handler *Handler) Logout(w http.ResponseWriter, r *http.Request) {
+func (handler *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	coo := &http.Cookie{
 		Name:     "session-cookie",
 		Value:    "",
@@ -46,7 +47,7 @@ func (handler *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (handler *Handler) Login(w http.ResponseWriter, r *http.Request) {
+func (handler *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	loginInfo := struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -90,8 +91,8 @@ func (handler *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (handler *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
-	user, err := entities.NewUserFromRequestBody(r.Body)
+func (handler *UserHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
+	user, err := user.NewUserFromRequestBody(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 

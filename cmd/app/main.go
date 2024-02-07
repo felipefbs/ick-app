@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/felipefbs/ick-app/database"
-	"github.com/felipefbs/ick-app/server"
+	"github.com/felipefbs/ick-app/internal/database"
+	"github.com/felipefbs/ick-app/internal/server"
 )
 
 func main() {

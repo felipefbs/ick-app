@@ -1,23 +1,24 @@
-package ick
+package repositories
 
 import (
 	"context"
 	"database/sql"
 	"log/slog"
 
-	"github.com/felipefbs/ick-app/entities"
+	"github.com/felipefbs/ick-app/pkg/ick"
+	"github.com/felipefbs/ick-app/pkg/user"
 	"github.com/google/uuid"
 )
 
-type Repository struct {
+type IckRepository struct {
 	db *sql.DB
 }
 
-func NewRepository(db *sql.DB) *Repository {
-	return &Repository{db: db}
+func NewIckRepository(db *sql.DB) *IckRepository {
+	return &IckRepository{db: db}
 }
 
-func (repo *Repository) Save(ctx context.Context, ick string, userID uuid.UUID) error {
+func (repo *IckRepository) Save(ctx context.Context, ick string, userID uuid.UUID) error {
 	if ick == "" {
 		slog.Warn("cant save empty ick")
 
@@ -58,7 +59,7 @@ func (repo *Repository) Save(ctx context.Context, ick string, userID uuid.UUID) 
 	return nil
 }
 
-func (repo *Repository) Upvote(ctx context.Context, userID, ickID uuid.UUID) error {
+func (repo *IckRepository) Upvote(ctx context.Context, userID, ickID uuid.UUID) error {
 	_, err := repo.db.ExecContext(ctx, "INSERT INTO user_icks (user_id, icks_id) values (?, ?)", userID, ickID)
 	if err != nil {
 		slog.Error("failed to save ick into database", "error", err, "table", "user_icks")
@@ -68,7 +69,7 @@ func (repo *Repository) Upvote(ctx context.Context, userID, ickID uuid.UUID) err
 	return nil
 }
 
-func (repo *Repository) Get(ctx context.Context) ([]entities.Ick, error) {
+func (repo *IckRepository) Get(ctx context.Context) ([]ick.Ick, error) {
 	tx, err := repo.db.BeginTx(ctx, &sql.TxOptions{
 		ReadOnly: true,
 	})
@@ -89,7 +90,7 @@ func (repo *Repository) Get(ctx context.Context) ([]entities.Ick, error) {
 
 	defer rows.Close()
 
-	ickList := make([]entities.Ick, 0)
+	ickList := make([]ick.Ick, 0)
 	for rows.Next() {
 		var id, registeredBy uuid.UUID
 		var ickName string
@@ -99,7 +100,7 @@ func (repo *Repository) Get(ctx context.Context) ([]entities.Ick, error) {
 			slog.Error("failed to scan an ick", "error", err)
 		}
 
-		foundIck := entities.Ick{ID: id, Ick: ickName, RegisteredBy: registeredBy}
+		foundIck := ick.Ick{ID: id, Ick: ickName, RegisteredBy: registeredBy}
 
 		var username string
 		err = tx.QueryRowContext(ctx, "SELECT username FROM users where id = ?", registeredBy).Scan(&username)
@@ -107,7 +108,7 @@ func (repo *Repository) Get(ctx context.Context) ([]entities.Ick, error) {
 			slog.Error("failed to scan an ick", "error", err, "table", "users")
 		}
 
-		foundIck.User = entities.User{
+		foundIck.User = user.User{
 			ID:       registeredBy,
 			Username: username,
 		}
@@ -125,7 +126,7 @@ func (repo *Repository) Get(ctx context.Context) ([]entities.Ick, error) {
 	return ickList, nil
 }
 
-func (repo *Repository) FindUserIcks(ctx context.Context, userID uuid.UUID) (map[uuid.UUID]bool, error) {
+func (repo *IckRepository) FindUserIcks(ctx context.Context, userID uuid.UUID) (map[uuid.UUID]bool, error) {
 	rows, err := repo.db.QueryContext(ctx, "SELECT icks_id from user_icks where user_id = ?", userID)
 	if err != nil {
 		slog.Error("failed to get users icks", "error", err, "table", "user_icks")

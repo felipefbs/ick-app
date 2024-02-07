@@ -3,15 +3,15 @@ package server
 import (
 	"database/sql"
 
-	"github.com/felipefbs/ick-app/ick"
-	"github.com/felipefbs/ick-app/user"
+	"github.com/felipefbs/ick-app/internal/handlers"
+	"github.com/felipefbs/ick-app/internal/repositories"
 	"github.com/go-chi/chi/v5"
 )
 
 func registerIckRoutes(router chi.Router, db *sql.DB) {
-	repo := ick.NewRepository(db)
-	userRepo := user.NewRepository(db)
-	handler := ick.NewHandler(repo, userRepo)
+	repo := repositories.NewIckRepository(db)
+	userRepo := repositories.NewUserRepository(db)
+	handler := handlers.NewIckHandler(repo, userRepo)
 
 	router.Get("/", handler.MainPage)
 
@@ -25,8 +25,8 @@ func registerIckRoutes(router chi.Router, db *sql.DB) {
 }
 
 func registerUserRoutes(router chi.Router, db *sql.DB) {
-	repo := user.NewRepository(db)
-	handler := user.NewHandler(repo)
+	repo := repositories.NewUserRepository(db)
+	handler := handlers.NewUserHandler(repo)
 
 	router.Get("/register-user", handler.RegisterPage)
 	router.Post("/login", handler.Login)

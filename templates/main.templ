@@ -1,8 +1,8 @@
 package templates
 
-import "github.com/felipefbs/ick-app/entities"
 import "fmt"
 import "github.com/google/uuid"
+import "github.com/felipefbs/ick-app/pkg/ick"
 
 templ Main(content templ.Component) {
 	<!DOCTYPE html>
@@ -94,7 +94,7 @@ templ Definition() {
 	</body>
 }
 
-templ IckList(ickList []entities.Ick, loggedUsername string, upvotedList map[uuid.UUID]bool) {
+templ IckList(ickList []ick.Ick, loggedUsername string, upvotedList map[uuid.UUID]bool) {
 	<body id="body">
 		@Header()
 		<ul hx-get="/ick-list" hx-swap="outerHTML" hx-target="#body" hx-trigger="none">

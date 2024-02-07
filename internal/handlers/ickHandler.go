@@ -1,28 +1,28 @@
-package ick
+package handlers
 
 import (
 	"log/slog"
 	"net/http"
 
+	"github.com/felipefbs/ick-app/internal/repositories"
 	"github.com/felipefbs/ick-app/templates"
-	"github.com/felipefbs/ick-app/user"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
 
-type Handler struct {
-	repo     *Repository
-	userRepo *user.Repository
+type IckHandler struct {
+	repo     *repositories.IckRepository
+	userRepo *repositories.UserRepository
 }
 
-func NewHandler(repo *Repository, userRepo *user.Repository) *Handler {
-	return &Handler{
+func NewIckHandler(repo *repositories.IckRepository, userRepo *repositories.UserRepository) *IckHandler {
+	return &IckHandler{
 		repo:     repo,
 		userRepo: userRepo,
 	}
 }
 
-func (handler *Handler) ListPage(w http.ResponseWriter, r *http.Request) {
+func (handler *IckHandler) ListPage(w http.ResponseWriter, r *http.Request) {
 	ickList, err := handler.repo.Get(r.Context())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -53,28 +53,28 @@ func (handler *Handler) ListPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (handler *Handler) MainPage(w http.ResponseWriter, r *http.Request) {
+func (handler *IckHandler) MainPage(w http.ResponseWriter, r *http.Request) {
 	err := templates.Main(templates.Definition()).Render(r.Context(), w)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
 
-func (handler *Handler) IckPage(w http.ResponseWriter, r *http.Request) {
+func (handler *IckHandler) IckPage(w http.ResponseWriter, r *http.Request) {
 	err := templates.Main(templates.RegisterIck()).Render(r.Context(), w)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
 
-func (handler *Handler) DefinitionPage(w http.ResponseWriter, r *http.Request) {
+func (handler *IckHandler) DefinitionPage(w http.ResponseWriter, r *http.Request) {
 	err := templates.Main(templates.Definition()).Render(r.Context(), w)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
 
-func (handler *Handler) RegisterIck(w http.ResponseWriter, r *http.Request) {
+func (handler *IckHandler) RegisterIck(w http.ResponseWriter, r *http.Request) {
 	coo, err := r.Cookie("session-cookie")
 	if err != nil {
 		slog.Error("failed to get session cookie", "error", err)
@@ -104,7 +104,7 @@ func (handler *Handler) RegisterIck(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (handler *Handler) Upvote(w http.ResponseWriter, r *http.Request) {
+func (handler *IckHandler) Upvote(w http.ResponseWriter, r *http.Request) {
 	coo, err := r.Cookie("session-cookie")
 	if err != nil {
 		slog.Error("failed to get cookie", "error", err)
