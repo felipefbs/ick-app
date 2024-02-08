@@ -1,0 +1,47 @@
+package templates
+
+import "github.com/felipefbs/ick-app/pkg/ick"
+import "github.com/google/uuid"
+import "fmt"
+
+templ Definition() {
+	@Base() {
+		<h1>Icks</h1>
+		<p>
+			Icks, em uma tradução não informal, é um ranço que você tenha, geralmente totalmente aleatorio e irracional, mas as vezes assertivo e podendo ser algo que afete completamente o seu relacionamento. 
+		</p>
+		<p>
+			Ele geralmente vem no seu primeiro encontro, onde seu pretendente faz algo que para ele pode ser até normal, mas você tem um ranço profundo sobre isso.
+		</p>
+		<ul>
+			<li>Dentes levemente tortos</li>
+			<li>Mastiga de boca aberta</li>
+			<li>Fica com bafo de suco de abacaxi depois de tomar suco de abacaxi</li>
+		</ul>
+	}
+}
+
+templ IckList(ickList []ick.Ick, loggedUsername string, upvotedList map[uuid.UUID]bool) {
+	<body id="body">
+		<ul hx-get="/ick-list" hx-swap="outerHTML" hx-target="#body" hx-trigger="none">
+			for _, item := range ickList {
+				<li>
+					{ item.Ick } - { item.User.Username }
+					if item.User.ID.String() != loggedUsername && !upvotedList[item.ID] {
+						<button type="button" hx-put={ fmt.Sprintf("/upvote/%v", item.ID) }>eca!</button>
+					}
+				</li>
+			}
+		</ul>
+	</body>
+}
+
+templ registerick() {
+	@Base() {
+		<h1>Cadastre seus ranços</h1>
+		<form>
+			<input placeholder="qual o ranço da vez?" type="text" name="ick"/>
+			<button type="button" hx-post="/register" hx-target="#body">eca!</button>
+		</form>
+	}
+}

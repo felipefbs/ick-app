@@ -21,7 +21,7 @@ tmp_dir = "tmp"
   poll = false
   poll_interval = 0
   post_cmd = []
-  pre_cmd = ["templ generate -path ./templates", "golangci-lint run"]
+  pre_cmd = ["templ generate -path ./templates", "tailwind -i templates/input.css -o static/styles/output.css"]
   rerun = false
   rerun_delay = 500
   send_interrupt = false
@@ -39,7 +39,7 @@ tmp_dir = "tmp"
   time = false
 
 [misc]
-  clean_on_exit = false
+  clean_on_exit = true
 
 [screen]
   clear_on_rebuild = false
