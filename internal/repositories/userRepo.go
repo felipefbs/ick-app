@@ -42,6 +42,19 @@ func (repo *UserRepository) GetByUsername(ctx context.Context, username string) 
 	return &user, nil
 }
 
+func (repo *UserRepository) GetByUserID(ctx context.Context, userID uuid.UUID) (*user.User, error) {
+	user := user.User{}
+
+	err := repo.db.QueryRow("SELECT id, username, name, gender, birthdate from users where id = ?", userID).Scan(&user.ID, &user.Username, &user.Name, &user.Gender, &user.Birthdate)
+	if err != nil {
+		slog.Error("failed to find user", "error", err, "username", userID)
+
+		return nil, err
+	}
+
+	return &user, nil
+}
+
 func (repo *UserRepository) GetUserIDByUsername(ctx context.Context, username string) (uuid.UUID, error) {
 	id := uuid.UUID{}
 	err := repo.db.QueryRowContext(ctx, "select id from users where username = ?", username).Scan(&id)

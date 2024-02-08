@@ -26,6 +26,7 @@ func NewUser(username, name, gender, birthdate, password string) (*User, error) 
 	}
 
 	return &User{
+		ID:        uuid.New(),
 		Username:  username,
 		Name:      name,
 		Gender:    gender,

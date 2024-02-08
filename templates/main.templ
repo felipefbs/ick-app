@@ -33,7 +33,7 @@ templ Base() {
 			<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
 			<title>Ranços</title>
 		</head>
-		<body class="bg-disgust-default">
+		<body class="bg-disgust-500">
 			{ children... }
 		</body>
 	</html>
@@ -42,7 +42,7 @@ templ Base() {
 
 templ Header(isLogged bool) {
 	<header>
-		<nav hx-boost="true" class="bg-disgust-darkest text-white w-full h-[100px] flex justify-evenly items-center">
+		<nav hx-boost="true" class="bg-disgust-800 text-white w-full h-[100px] flex justify-evenly items-center">
 			<div class="w-2/3 flex justify-evenly">
 				@NavAnchor("", "Eca!")
 				@NavAnchor("", "Lista da galera")
@@ -50,12 +50,12 @@ templ Header(isLogged bool) {
 			</div>
 			if isLogged {
 				<div class="w-1/3">
-					@NavAnchor("", "Perfil")
+					@NavAnchor("/profile", "Perfil")
 				</div>
 			} else {
 				<div class="w-1/3 flex justify-end">
-					@NavAnchor("", "Logar")
-					@NavAnchor("", "Cadastrar")
+					@NavAnchor("/login", "Logar")
+					@NavAnchor("/register-user", "Cadastrar")
 				</div>
 			}
 		</nav>

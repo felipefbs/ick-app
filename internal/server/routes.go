@@ -2,6 +2,7 @@ package server
 
 import (
 	"database/sql"
+	"net/http"
 
 	"github.com/felipefbs/ick-app/internal/handlers"
 	"github.com/felipefbs/ick-app/internal/repositories"
@@ -13,7 +14,8 @@ func registerIckRoutes(router chi.Router, db *sql.DB) {
 	userRepo := repositories.NewUserRepository(db)
 	handler := handlers.NewIckHandler(repo, userRepo)
 
-	router.Get("/", handler.MainPage)
+	router.Handle("/", http.RedirectHandler("/home", http.StatusPermanentRedirect))
+	router.Get("/home", handler.MainPage)
 
 	router.Get("/ick-list", handler.ListPage)
 	router.Get("/definition", handler.DefinitionPage)
@@ -28,8 +30,13 @@ func registerUserRoutes(router chi.Router, db *sql.DB) {
 	repo := repositories.NewUserRepository(db)
 	handler := handlers.NewUserHandler(repo)
 
-	router.Get("/register-user", handler.RegisterPage)
-	router.Post("/login", handler.Login)
+	router.Get("/profile", handler.ProfilePage)
 	router.Post("/logout", handler.Logout)
+
+	router.Get("/login", handler.LoginPage)
+	router.Post("/login", handler.Login)
+
+	router.Get("/register-user", handler.RegisterUserPage)
 	router.Post("/register-user", handler.RegisterUser)
+
 }

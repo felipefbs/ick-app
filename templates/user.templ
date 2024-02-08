@@ -1,37 +1,103 @@
 package templates
 
+import "fmt"
+import "github.com/felipefbs/ick-app/pkg/user"
+
 templ UserPage() {
 }
 
-templ RegisterUser() {
+templ LoginPage() {
 	@Base() {
+		<div class="flex justify-center">
+			<div class="flex justify-center bg-disgust-800 flex-col p-10 m-10 rounded-md min-w-[250px] max-w-[350px]">
+				@LoginComponent(false)
+				<button type="button" hx-get="/register-user" hx-target="body" hx-replace-url="true" class="bg-disgust-300 rounded-md mt-10">Cadastrar</button>
+			</div>
+		</div>
 	}
 }
 
-templ LoginComponent() {
-	<div>
-		<h1>Login</h1>
-		<form>
-			<input placeholder="username" type="text" name="username"/>
-			<input placeholder="senha" type="password" name="password"/>
-			<button type="button" hx-post="/login" hx-ext="json-enc" hx-target="#body">login</button>
-		</form>
-	</div>
+templ RegisterPage() {
+	@Base() {
+		<div class="flex justify-center">
+			<div class="flex justify-center bg-disgust-800 flex-col p-10 m-10 rounded-md min-w-[250px] max-w-[350px]">
+				@RegisterUserComponent()
+				<button type="button" hx-get="/login" hx-target="body" hx-replace-url="true" class="bg-disgust-300 rounded-md mt-10">Login</button>
+			</div>
+		</div>
+	}
 }
 
-templ LogonComponent() {
-	<div>
-		<h1>Cadastre-se</h1>
-		<p>
-			Seus dados serão usados apenas para fazer uma simples analise. Prometo não vender nada. Se quiser conferir o código só acessar o projeto <a href="www.github.com/felipefbs/ick-app">aqui</a>.
-		</p>
-		<form>
-			<input placeholder="username" type="text" name="username"/>
-			<input placeholder="Seu Nome" type="text" name="name"/>
-			<input placeholder="Data de Nascimento" type="date" name="birthdate"/>
-			<input placeholder="Genero" type="text" name="gender"/>
-			<input placeholder="senha" type="password" name="password"/>
-			<input type="submit" hx-post="/register-user" hx-ext="json-enc"/>
-		</form>
-	</div>
+templ ProfilePage(user *user.User) {
+	@Base() {
+		@Header(true)
+		<div class="flex justify-center items-center flex-col">
+			<div class="flex justify-center bg-disgust-800 flex-col p-10 m-10 rounded-md min-w-[250px] max-w-[350px]">
+				@EditButton("self-end fill-white hover:scale-[103%]")
+				<p class="text-white">Username: { user.Username }</p>
+				<p class="text-white">Name: { user.Name }</p>
+				<p class="text-white">Birthdate: { user.Birthdate }</p>
+				<p class="text-white">Gender: { user.Gender }</p>
+			</div>
+			<button type="button" hx-post="/logout" hx-replace-url="true" class="bg-red-900 text-white p-2" hx-target="body">Deslogar</button>
+		</div>
+	}
+}
+
+templ EditButton(class string) {
+	<button type="button" class={ class }>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class={ "w-6 h-6" + class }>
+			<path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z"></path>
+			<path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z"></path>
+		</svg>
+	</button>
+}
+
+templ LoginComponent(isFailed bool) {
+	<form
+		id="login-form"
+		class="flex flex-col"
+		hx-post="/login"
+		hx-ext="json-enc"
+		hx-target="body"
+		hx-replace-url="true"
+	>
+		@InputComponent("usuario", "text", "username", isFailed)
+		@InputComponent("senha", "password", "password", isFailed)
+		<button type="submit" class="bg-disgust-200 rounded-md">login</button>
+	</form>
+}
+
+templ RegisterUserComponent() {
+	<form
+		id="register-form"
+		class="flex flex-col"
+		hx-post="/register-user"
+		hx-ext="json-enc"
+		hx-target="body"
+		hx-replace-url="true"
+	>
+		<p class="text-white">username</p>
+		@InputComponent("usuário", "text", "username", false)
+		<p class="text-white">Seu Nome</p>
+		@InputComponent("nome completo", "text", "name", false)
+		<p class="text-white">data de nascimento</p>
+		@InputComponent("data de nascimento", "date", "birthdate", false)
+		<p class="text-white">gênero</p>
+		@InputComponent("gênero", "text", "gender", false)
+		<p class="text-white">senha</p>
+		@InputComponent("senha", "password", "password", false)
+		<button type="submit" class="bg-disgust-200 rounded-md">Cadastrar</button>
+	</form>
+}
+
+templ InputComponent(placeholder, inputType, name string, isInvalid bool) {
+	<input
+		placeholder={ placeholder }
+		type={ inputType }
+		name={ name }
+		aria-invalid={ fmt.Sprint(isInvalid) }
+		class=" my-3 p-2 rounded-md
+                aria-[invalid=true]:border-solid aria-[invalid=true]:border-2 aria-[invalid=true]:border-red-600 aria-[invalid=true]:placeholder:text-red-600"
+	/>
 }

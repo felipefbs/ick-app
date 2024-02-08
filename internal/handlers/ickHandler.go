@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/felipefbs/ick-app/internal/repositories"
@@ -51,8 +52,17 @@ func (handler *IckHandler) ListPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *IckHandler) MainPage(w http.ResponseWriter, r *http.Request) {
-	isLogged := true
-	err := templates.MainPage(isLogged).Render(r.Context(), w)
+	coo, err := r.Cookie("session-cookie")
+	if err != nil {
+		slog.Error("failed to get cookie", "error", err)
+	}
+
+	isLogged := coo.Valid() == nil
+	if err != nil {
+		slog.Error("invalid cookie", "error", err, "cookie", coo)
+	}
+
+	err = templates.MainPage(isLogged).Render(r.Context(), w)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
