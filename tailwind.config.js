@@ -1,20 +1,24 @@
-/** @type {import('tailwindcss').Config} */
+/** @type {import("tailwindcss").Config} */
 module.exports = {
     content: ["./templates/**/*.{templ,html}"],
     theme: {
-        colors: {
-            transparent: 'transparent',
-            current: 'currentColor',
-            'white': '#ffffff',
-            'disgust': {
-                darkest: '#0C3819',
-                dark: "#30512b",
-                default: "#398f67",
-                light: "#76f7aa",
-                bright: "#b6dfb0"
-            }
+        extend: {
+            colors: {
+                "disgust": {
+                    '50': '#f0f9f4',
+                    '100': '#dbf0e2',
+                    '200': '#bae0ca',
+                    '300': '#8cc9a9',
+                    '400': '#5bac83',
+                    '500': '#398f67',
+                    '600': '#287352',
+                    '700': '#205c43',
+                    '800': '#1c4936',
+                    '900': '#183c2e',
+                    '950': '#0c221a',
+                },
+            },
         },
-        extend: {},
     },
     plugins: [],
 }
