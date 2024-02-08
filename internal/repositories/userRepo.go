@@ -20,7 +20,7 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 func (repo *UserRepository) Save(ctx context.Context, user *user.User) error {
 	_, err := repo.db.ExecContext(ctx,
 		"INSERT INTO users (id, username, name, birthdate, gender, password) values ($1, $2, $3, $4, $5, $6)",
-		uuid.New(), user.Username, user.Name, user.Birthdate, user.Gender, user.Password)
+		user.ID, user.Username, user.Name, user.Birthdate, user.Gender, user.Password)
 	if err != nil {
 		slog.Error("failed to save user into database", "error", err)
 
@@ -47,7 +47,7 @@ func (repo *UserRepository) GetByUserID(ctx context.Context, userID uuid.UUID) (
 
 	err := repo.db.QueryRow("SELECT id, username, name, gender, birthdate from users where id = ?", userID).Scan(&user.ID, &user.Username, &user.Name, &user.Gender, &user.Birthdate)
 	if err != nil {
-		slog.Error("failed to find user", "error", err, "username", userID)
+		slog.Error("failed to find user", "error", err, "user id", userID)
 
 		return nil, err
 	}
