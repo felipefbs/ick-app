@@ -11,7 +11,9 @@ CREATE TABLE "users" (
 CREATE TABLE "icks" (
   "id" uuid PRIMARY KEY,
   "ick" text,
-  "registered_by" int default 0 REFERENCES "users" ("id"),
+  "registered_by" uuid REFERENCES "users" ("id"),
+  "upvotes" int default 0,
+  "downvotes" int default 0,
   "created_at" timestamp DEFAULT (CURRENT_TIMESTAMP)
 );
 
