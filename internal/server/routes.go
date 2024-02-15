@@ -17,13 +17,10 @@ func registerIckRoutes(router chi.Router, db *sql.DB) {
 	router.Handle("/", http.RedirectHandler("/home", http.StatusPermanentRedirect))
 	router.Get("/home", handler.MainPage)
 
-	router.Get("/ick-list", handler.ListPage)
-	router.Get("/definition", handler.DefinitionPage)
-	router.Get("/register", handler.IckPage)
+	router.Get("/ick-list", handler.IckListPage)
 
-	router.Put("/upvote/{ick-id}", handler.Upvote)
-
-	router.Post("/register", handler.RegisterIck)
+	router.Get("/ick", handler.RegisterIckPage)
+	router.Post("/ick", handler.RegisterIck)
 }
 
 func registerUserRoutes(router chi.Router, db *sql.DB) {

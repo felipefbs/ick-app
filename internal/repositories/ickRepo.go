@@ -69,7 +69,7 @@ func (repo *IckRepository) Upvote(ctx context.Context, userID, ickID uuid.UUID) 
 	return nil
 }
 
-func (repo *IckRepository) Get(ctx context.Context) ([]ick.Ick, error) {
+func (repo *IckRepository) Get(ctx context.Context, userID ...uuid.UUID) ([]ick.Ick, error) {
 	tx, err := repo.db.BeginTx(ctx, &sql.TxOptions{
 		ReadOnly: true,
 	})
@@ -81,11 +81,22 @@ func (repo *IckRepository) Get(ctx context.Context) ([]ick.Ick, error) {
 
 	defer tx.Rollback()
 
-	rows, err := tx.QueryContext(ctx, "SELECT id, ick, registered_by FROM icks")
-	if err != nil {
-		slog.Error("failed to list all icks", "error", err, "table", "icks")
+	var rows *sql.Rows
 
-		return nil, err
+	if len(userID) == 0 {
+		rows, err = tx.QueryContext(ctx, "SELECT id, ick, registered_by FROM icks order by created_at desc")
+		if err != nil {
+			slog.Error("failed to list all icks", "error", err, "table", "icks")
+
+			return nil, err
+		}
+	} else {
+		rows, err = tx.QueryContext(ctx, "SELECT id, ick, registered_by FROM icks where registered_by = ? order by created_at desc", userID[0])
+		if err != nil {
+			slog.Error("failed to list all icks", "error", err, "table", "icks")
+
+			return nil, err
+		}
 	}
 
 	defer rows.Close()

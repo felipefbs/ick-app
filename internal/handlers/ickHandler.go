@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/felipefbs/ick-app/internal/helpers"
 	"github.com/felipefbs/ick-app/internal/repositories"
 	"github.com/felipefbs/ick-app/templates"
 )
@@ -20,59 +21,41 @@ func NewIckHandler(repo *repositories.IckRepository, userRepo *repositories.User
 	}
 }
 
-func (handler *IckHandler) ListPage(w http.ResponseWriter, r *http.Request) {
-	// ickList, err := handler.repo.Get(r.Context())
-	// if err != nil {
-	// 	w.WriteHeader(http.StatusInternalServerError)
+func (handler *IckHandler) IckListPage(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	userID, _ := helpers.IsLogged(ctx)
 
-	// 	return
-	// }
+	ickList, err := handler.repo.Get(ctx)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to find general ick list", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
 
-	// coo, err := r.Cookie("session-cookie")
-	// if err != nil {
-	// 	slog.Error("failed to get cookie", "error", err)
-	// 	w.WriteHeader(http.StatusBadRequest)
-	// 	return
-	// }
-	// userID, err := uuid.Parse(coo.Value)
-	// if err != nil {
-	// 	slog.Error("failed to parse user id", "error", err)
-	// }
+		return
+	}
 
-	// userIckList, err := handler.repo.FindUserIcks(r.Context(), userID)
-	// if err != nil {
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	return
-	// }
+	userIckList, err := handler.repo.FindUserIcks(ctx, userID)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to find user ick list", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
 
-	// err = templates.Main(templates.IckList(ickList, coo.Value, userIckList)).Render(r.Context(), w)
-	// if err != nil {
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// }
+		return
+	}
+
+	err = templates.IckListPage(true, ickList, userID.String(), userIckList).Render(ctx, w)
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to render ick list page", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
 }
 
 func (handler *IckHandler) MainPage(w http.ResponseWriter, r *http.Request) {
-	coo, err := r.Cookie("session-cookie")
-	if err != nil {
-		slog.Error("failed to get cookie", "error", err)
-	}
+	_, isLogged := helpers.IsLogged(r.Context())
 
-	isLogged := coo.Valid() == nil
-	if err != nil {
-		slog.Error("invalid cookie", "error", err, "cookie", coo)
-	}
-
-	err = templates.MainPage(isLogged).Render(r.Context(), w)
+	err := templates.MainPage(isLogged).Render(r.Context(), w)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-}
-
-func (handler *IckHandler) IckPage(w http.ResponseWriter, r *http.Request) {
-	// err := templates.Main(templates.RegisterIck()).Render(r.Context(), w)
-	// if err != nil {
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// }
 }
 
 func (handler *IckHandler) DefinitionPage(w http.ResponseWriter, r *http.Request) {
@@ -82,34 +65,40 @@ func (handler *IckHandler) DefinitionPage(w http.ResponseWriter, r *http.Request
 	// }
 }
 
+func (handler *IckHandler) RegisterIckPage(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	userID, isLogged := helpers.IsLogged(ctx)
+
+	ickList, err := handler.repo.Get(ctx, userID)
+
+	err = templates.RegisterIck(isLogged, ickList).Render(r.Context(), w)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+}
+
 func (handler *IckHandler) RegisterIck(w http.ResponseWriter, r *http.Request) {
-	// coo, err := r.Cookie("session-cookie")
-	// if err != nil {
-	// 	slog.Error("failed to get session cookie", "error", err)
-	// }
+	ctx := r.Context()
 
-	// userID := uuid.UUID{}
-	// if err := coo.Valid(); err == nil {
-	// 	userID, _ = uuid.Parse(coo.Value)
-	// }
+	userID, _ := helpers.IsLogged(ctx)
+	ickValue := r.FormValue("ick")
 
-	// ick := r.FormValue("ick")
-	// slog.Info(ick)
+	err := handler.repo.Save(ctx, ickValue, userID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 
-	// err = handler.repo.Save(r.Context(), ick, userID)
-	// if err != nil {
-	// 	w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
-	// 	return
-	// }
+	ickList, err := handler.repo.Get(ctx, userID)
 
-	// err = templates.Main(templates.RegisterIck()).Render(r.Context(), w)
-	// if err != nil {
-	// 	slog.Error("failed to render template", "error", err)
-	// 	w.WriteHeader(http.StatusInternalServerError)
+	err = templates.IckList(ickList).Render(ctx, w)
+	if err != nil {
+		slog.Error("failed to render template", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
 
-	// 	return
-	// }
+		return
+	}
 }
 
 func (handler *IckHandler) Upvote(w http.ResponseWriter, r *http.Request) {

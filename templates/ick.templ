@@ -21,27 +21,68 @@ templ Definition() {
 	}
 }
 
-templ IckList(ickList []ick.Ick, loggedUsername string, upvotedList map[uuid.UUID]bool) {
-	<body id="body">
-		<ul hx-get="/ick-list" hx-swap="outerHTML" hx-target="#body" hx-trigger="none">
-			for _, item := range ickList {
-				<li>
-					{ item.Ick } - { item.User.Username }
-					if item.User.ID.String() != loggedUsername && !upvotedList[item.ID] {
-						<button type="button" hx-put={ fmt.Sprintf("/upvote/%v", item.ID) }>eca!</button>
-					}
-				</li>
-			}
-		</ul>
-	</body>
+templ IckListPage(isLooged bool, ickList []ick.Ick, loggedUsername string, upvotedList map[uuid.UUID]bool) {
+	@Base() {
+		@Header(isLooged)
+		<main class="flex flex-col justify-center items-center">
+			@IckList(ickList)
+		</main>
+	}
 }
 
-templ registerick() {
+templ IckList(ickList []ick.Ick) {
+	<ul id="ick-list" class="flex flex-col w-full">
+		for _, v := range ickList {
+			<li class="bg-disgust-800 m-10 p-5 flex justify-between rounded-md min-w-[500px]">
+				@IckItem(&v)
+			</li>
+		}
+	</ul>
+}
+
+templ IckItem(ick *ick.Ick) {
+	<div class="flex">
+		<div class="upvotes flex flex-col items-center justify-center">
+			<span>
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+					<path stroke-linecap="round" stroke-linejoin="round" d="m4.5 18.75 7.5-7.5 7.5 7.5"></path>
+					<path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 7.5-7.5 7.5 7.5"></path>
+				</svg>
+			</span>
+			<p class="text-white text-xl">{ fmt.Sprint(ick.Upvotes) }</p>
+		</div>
+		<div class="downvotes flex flex-col items-center justify-center">
+			<span>
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+					<path stroke-linecap="round" stroke-linejoin="round" d="m4.5 5.25 7.5 7.5 7.5-7.5m-15 6 7.5 7.5 7.5-7.5"></path>
+				</svg>
+			</span>
+			<p class="text-white text-xl">{ fmt.Sprint(ick.Downvotes) }</p>
+		</div>
+		<strong class="text-white text-3xl mx-3">{ ick.Ick }</strong>
+	</div>
+	<p class="text-white text-xl">{ ick.User.Username }</p>
+}
+
+templ RegisterIck(isLogged bool, ickList []ick.Ick) {
 	@Base() {
-		<h1>Cadastre seus ranços</h1>
-		<form>
-			<input placeholder="qual o ranço da vez?" type="text" name="ick"/>
-			<button type="button" hx-post="/register" hx-target="#body">eca!</button>
-		</form>
+		@Header(isLogged)
+		<div class="register-form flex flex-col items-center justify-center">
+			@IckRegisterForm()
+			@IckList(ickList)
+		</div>
 	}
+}
+
+templ IckRegisterForm() {
+	<form
+		id="ick-form"
+		hx-post="/ick"
+		hx-target="#ick-list"
+		max="5"
+		class="bg-disgust-700 rounded-md h-16 flex justify-stretch w-[300px] m-10 out-of-range:border-red-500"
+	>
+		<input type="text" placeholder="qual o seu ranço?" class="px-2 h-full rounded-l-md w-2/3" name="ick"/>
+		<button type="submit" class="bg-disgust-950 text-white p-2 h-full rounded-r-md w-1/3">Eca!</button>
+	</form>
 }

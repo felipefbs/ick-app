@@ -44,9 +44,8 @@ templ Header(isLogged bool) {
 	<header>
 		<nav hx-boost="true" class="bg-disgust-800 text-white w-full h-[100px] flex justify-evenly items-center">
 			<div class="w-2/3 flex justify-evenly">
-				@NavAnchor("", "Eca!")
-				@NavAnchor("", "Lista da galera")
-				@NavAnchor("", "Sua lista")
+				@NavAnchor("/ick", "Eca!")
+				@NavAnchor("/ick-list", "Lista da galera")
 			</div>
 			if isLogged {
 				<div class="w-1/3">

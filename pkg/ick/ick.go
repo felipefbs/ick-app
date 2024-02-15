@@ -8,6 +8,8 @@ import (
 type Ick struct {
 	ID           uuid.UUID
 	Ick          string
+	Upvotes      int
+	Downvotes    int
 	RegisteredBy uuid.UUID
 	User         user.User
 }
