@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -16,7 +17,7 @@ func Init(db *sql.DB) *http.Server {
 
 	router.Use(middleware.Logger)
 	router.Use(hotReload)
-	// router.Use(VerifyCookieSession)
+	router.Use(VerifyCookieSession)
 
 	fs := http.FileServer(http.Dir("./static"))
 	router.Handle("/static/*", http.StripPrefix("/static/", fs))
@@ -59,22 +60,19 @@ func hotReload(next http.Handler) http.Handler {
 
 func VerifyCookieSession(next http.Handler) http.Handler {
 	f := func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/register-user" || r.URL.Path == "/login" {
-			fmt.Println(r.URL.Path)
-			next.ServeHTTP(w, r)
-
-			return
-		}
-
 		coo, err := r.Cookie("session-cookie")
 		if err != nil || coo.Valid() != nil {
-			http.Redirect(w, r, "/register-user", http.StatusPermanentRedirect)
+			ctx := context.WithValue(r.Context(), "isLogged", false)
+			r = r.WithContext(ctx)
+
 			next.ServeHTTP(w, r)
 
 			return
 		}
 
 		ctx := context.WithValue(r.Context(), "user", coo.Value)
+		ctx = context.WithValue(ctx, "isLogged", true)
+		slog.InfoContext(ctx, "user info", "userID", coo.Value)
 
 		r = r.WithContext(ctx)
 
