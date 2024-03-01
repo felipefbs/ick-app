@@ -70,9 +70,7 @@ func (repo *IckRepository) Upvote(ctx context.Context, userID, ickID uuid.UUID) 
 }
 
 func (repo *IckRepository) Get(ctx context.Context, userID ...uuid.UUID) ([]ick.Ick, error) {
-	tx, err := repo.db.BeginTx(ctx, &sql.TxOptions{
-		ReadOnly: true,
-	})
+	tx, err := repo.db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
 		slog.Error("failed to start transaction", "error", err)
 

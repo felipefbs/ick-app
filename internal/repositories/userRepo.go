@@ -19,7 +19,7 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 
 func (repo *UserRepository) Save(ctx context.Context, user *user.User) error {
 	_, err := repo.db.ExecContext(ctx,
-		"INSERT INTO users (id, username, name, birthdate, gender, password) values ($1, $2, $3, $4, $5, $6)",
+		"INSERT INTO users (id, username, name, birthdate, gender, password) values (?, ?, ?, ?, ?, ?)",
 		user.ID, user.Username, user.Name, user.Birthdate, user.Gender, user.Password)
 	if err != nil {
 		slog.Error("failed to save user into database", "error", err)

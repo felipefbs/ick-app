@@ -1,15 +1,23 @@
 package server
 
 import (
-	"database/sql"
+	"log/slog"
 	"net/http"
 
+	"github.com/felipefbs/ick-app/internal/database"
 	"github.com/felipefbs/ick-app/internal/handlers"
 	"github.com/felipefbs/ick-app/internal/repositories"
 	"github.com/go-chi/chi/v5"
 )
 
-func registerIckRoutes(router chi.Router, db *sql.DB) {
+func registerIckRoutes(router chi.Router) {
+	db, err := database.Get()
+	if err != nil {
+		slog.Error("failed to get database", "error", err)
+
+		return
+	}
+
 	repo := repositories.NewIckRepository(db)
 	userRepo := repositories.NewUserRepository(db)
 	handler := handlers.NewIckHandler(repo, userRepo)
@@ -23,7 +31,14 @@ func registerIckRoutes(router chi.Router, db *sql.DB) {
 	router.Post("/ick", handler.RegisterIck)
 }
 
-func registerUserRoutes(router chi.Router, db *sql.DB) {
+func registerUserRoutes(router chi.Router) {
+	db, err := database.Get()
+	if err != nil {
+		slog.Error("failed to get database", "error", err)
+
+		return
+	}
+
 	repo := repositories.NewUserRepository(db)
 	handler := handlers.NewUserHandler(repo)
 
