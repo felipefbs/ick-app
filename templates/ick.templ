@@ -2,7 +2,7 @@ package templates
 
 import "github.com/felipefbs/ick-app/pkg/ick"
 import "github.com/google/uuid"
-import "fmt"
+import "strconv"
 
 templ Definition() {
 	@Base() {
@@ -49,7 +49,7 @@ templ IckItem(ick *ick.Ick) {
 					<path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 7.5-7.5 7.5 7.5"></path>
 				</svg>
 			</span>
-			<p class="text-white text-xl">{ fmt.Sprint(ick.Upvotes) }</p>
+			<p class="text-white text-xl">{ strconv.Itoa(ick.Upvotes) }</p>
 		</div>
 		<div class="downvotes flex flex-col items-center justify-center">
 			<span>
@@ -57,7 +57,7 @@ templ IckItem(ick *ick.Ick) {
 					<path stroke-linecap="round" stroke-linejoin="round" d="m4.5 5.25 7.5 7.5 7.5-7.5m-15 6 7.5 7.5 7.5-7.5"></path>
 				</svg>
 			</span>
-			<p class="text-white text-xl">{ fmt.Sprint(ick.Downvotes) }</p>
+			<p class="text-white text-xl">{ strconv.Itoa(ick.Downvotes) }</p>
 		</div>
 		<strong class="text-white text-3xl mx-3">{ ick.Ick }</strong>
 	</div>
